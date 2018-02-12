@@ -1,0 +1,10 @@
+override __init__
+python Composition_over_inheritance
+https://stackoverflow.com/questions/41491884/python-overriding-init
+https://stackoverflow.com/questions/8333354/how-to-override-constructor-of-python-class-with-many-arguments
+
+
+class decorator python 3
+https://krzysztofzuraw.com/blog/2016/python-class-decorators.html
+https://www.codementor.io/sheena/advanced-use-python-decorators-class-function-du107nxsv
+
