@@ -45,6 +45,11 @@ def msgType(tagger : str, description : str,
         pass
     else:
         exec(msgCode, context)
-    exec(code.format(tagger, description), context)
+    exec(classCode.format(tagger, description), context)
     return
+
+def beginnerProgram(updateFunc, appModel, viewFunc):
+    import inspect
+    ufs = inspect.getsource(updateFunc)
+    print(ufs[1])
 

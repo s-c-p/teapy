@@ -1,38 +1,27 @@
-import pysistence
+from tea import msgType
+
 import funcy
+import pysistence
 
 # bit.ly/2CcnB7M
 # so.com/q/3277367/
 
-from tea import beginnerProgram #, Msg
-
 # Model
 
-model = int()
+model = pysistence.make_dict(value=int())
 
 # update
 
-class Msg:
-    """ this should be a part of my lib, like `from
-    tea import Msg` """
-    def __init__(self, description):
-        self.description = description
-        return
-
-class Inc(Msg):
-    """ message to increase count """
-    def __init__(self):
-        super(Inc, self).__init__(self.__doc__)
-
-class Dec(Msg):
-    """ message to decrease count """
-    def __init__(self):
-        super(Dec, self).__init__(self.__doc__)
+msgType("Inc", "message to increase count", globals(), {})
+msgType("Dec", "message to decrease count", globals(), {})
 
 def update(msg : Msg, model : int): -> int
+    # logging, duplicate-error, non-exhaustive-error
     """ TODO: implement some way to check that all subclasses
     of Msg are accounted for, to find subclasses see:
     so.com/q/2219998 so.com/q/5881873 so.com/q/3862310
+    TODO: (low-priority, academic value) somehow implement the
+    `let tempVars in evaluatedExpression`, perhaps with contextmanager
     """
     ret = int()
     if isinstance(msg, Inc):
