@@ -1,67 +1,65 @@
+import uuid
 from contextlib import contextmanager
 
 class SwitchError(RuntimeError):
     pass
 
 @contextmanager
-def switch(switch_value, *, ignore_nomatch=True):
-    blocks = {}
-    blocks['default'] = None
+def switch(switchable):
+    #?scopes
+    blocks = dict()
 
-    def case(case_value):
-        '''Decorator to mark a particular switch case'''
+    # there might be a scenario where case_val IS the string `default`
+    # to mitigate false positive in duplicate-default scan, we generate a
+    # random string as key for holding actual default's responder function
+    defaultCaseKey = str(uuid.uuid4())
+    blocks[defaultCaseKey] = None
+
+    def case(case_val):
         def decorator(func):
-            if blocks.setdefault(case_value, func) is not func:
-                raise SwitchError('Repeated case: {}'.format(case_value))
+            try:
+                blocks[case_val]
+            except KeyError:
+                blocks[case_val] = func # first assignment
+            else:                       # means key:value pair already existed
+                raise SwitchError("Repeated case: %s" % case_val)
             return func
         return decorator
 
     def default(func):
-        '''Decorator to mark the default switch case'''
-        if blocks['default'] is not None:
-            raise SwitchError('Repeated default case')
-        blocks['default'] = func
+        if blocks[defaultCaseKey] is None:
+            blocks[defaultCaseKey] = func # first assignment
+        else:
+            raise SwitchError("Repeated default case")
         return func
-    
-    print(default)
 
     yield (case, default)
-    
-    def default_block():
-        if not ignore_nomatch:
-            raise SwitchError('No switch block matched')
 
-    blocks.get(switch_value, blocks['default'] or default_block)()
+    if blocks[defaultCaseKey] is None:
+        raise SwitchError("you did not handle the default clause of switch-case")
+    else:
+        defaultFn = blocks[defaultCaseKey]
 
-## EXAMPLE
+    # execute the desired function
+    executeFn = blocks.get(switchable, defaultFn)
+    executeFn()
+    return
 
-from enum import Enum
 
-class Suit(Enum):
-    hearts = 1
-    diamonds = 2
-    spades = 3
-    clubs = 4
+x = 55
+with switch(x) as cdTuple:
+    case, default = cdTuple
+    @case(4)
+    def _():
+        print("too less")
+    @case(5)
+    def _():
+        print("yes")
+    @case(6)
+    def _():
+        print("too much")
+    @default
+    def _():
+        print('no match found')
 
-def print_card_suit(card):
-    with switch(card.suit) as case, default:
-        @case(Suit.hearts)
-        def _():
-            print("Hearts!")
-
-        @case(Suit.diamonds)
-        def _():
-            print("Diamonds!")
-
-        @case(Suit.spades)
-        def _():
-            print("Spades!")
-
-        @case(Suit.clubs)
-        def _():
-            print("Clubs!")
-
-        @default
-        def _():
-            print("Invalid card suit!")
 
