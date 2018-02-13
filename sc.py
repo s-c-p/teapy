@@ -1,5 +1,9 @@
 import uuid
+import logging
 from contextlib import contextmanager
+
+LOG_FORMAT = '%(asctime)-15s %(message)s'
+logging.basicConfig(filename='time-travel.log', format=LOG_FORMAT)
 
 class SwitchError(RuntimeError):
     pass
@@ -42,24 +46,25 @@ def switch(switchable):
 
     # execute the desired function
     executeFn = blocks.get(switchable, defaultFn)
+    logging.info("%s (%s) recieved with args-- %s", ???)
     executeFn()
     return
 
 # tests
 
 def test_switch():
-    x = 55
+    x = 5
     with switch(x) as cdTuple:
         case, default = cdTuple
+
         @case(4)
         def _():
             print("too less")
+
         @case(5)
         def _():
             print("yes")
-        @case(6)
-        def _():
-            print("too much")
+
         @default
         def _():
             print('no match found')
