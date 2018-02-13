@@ -45,21 +45,23 @@ def switch(switchable):
     executeFn()
     return
 
+# tests
 
-x = 55
-with switch(x) as cdTuple:
-    case, default = cdTuple
-    @case(4)
-    def _():
-        print("too less")
-    @case(5)
-    def _():
-        print("yes")
-    @case(6)
-    def _():
-        print("too much")
-    @default
-    def _():
-        print('no match found')
-
+def test_switch():
+    x = 55
+    with switch(x) as cdTuple:
+        case, default = cdTuple
+        @case(4)
+        def _():
+            print("too less")
+        @case(5)
+        def _():
+            print("yes")
+        @case(6)
+        def _():
+            print("too much")
+        @default
+        def _():
+            print('no match found')
+    return
 
