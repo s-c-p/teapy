@@ -38,8 +38,9 @@ def msgType(tagger : str, description : str,
 
     TODO : implement typeArgDict in __init__
     """
+    # instead of doing:
     # context.update({'Msg' : globals()['Msg']})
-    # instead of disturbing foreign namespace again n again, we do
+    # and disturbing foreign namespace again n again, we do:
     if context.get('Msg'):
         pass
     else:
