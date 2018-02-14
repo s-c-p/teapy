@@ -1,13 +1,16 @@
-from tea import msgType
+import pysistence
+from tea.msgFactory import msgType
 
 import funcy
-import pysistence
-
 # bit.ly/2CcnB7M
 # so.com/q/3277367/
 
 # Model
 
+# type alias
+imDict = pysistence.persistent_dict.PDict
+
+model : imDict
 model = pysistence.make_dict(value=int())
 
 # update
@@ -15,27 +18,27 @@ model = pysistence.make_dict(value=int())
 msgType("Inc", "message to increase count", globals(), {})
 msgType("Dec", "message to decrease count", globals(), {})
 
-def update(msg : Msg, model : int): -> int
-    # logging, duplicate-error, non-exhaustive-error
-    """ TODO: implement some way to check that all subclasses
-    of Msg are accounted for, to find subclasses see:
-    so.com/q/2219998 so.com/q/5881873 so.com/q/3862310
-    TODO: (low-priority, academic value) somehow implement the
+def update(msg : Msg, model : imDict) -> imDict:
+    """ TODO: (low-priority, academic value) somehow implement the
     `let tempVars in evaluatedExpression`, perhaps with contextmanager
     """
-    ret = int()
-    if isinstance(msg, Inc):
-        ret = model + 1
-        # log(f"message recieved: {msg}")
-    elif isinstance(msg, Dec):
-        ret = model - 1
-    else:
-        raise RuntimeError("Unknow msg recieved")
-    return ret
+    with switch(msg) as (case, default):
+        @case(Inc)
+        def _():
+            old = model['value']
+            return model.using({'value' : old + 1})
+        @case(Dec)
+        def _():
+            old = model['value']
+            return model.using({'value' : old - 1})
+        @default
+        def _():
+            raise RuntimeError("Unknow msg recieved")
+    return model
 
 # view
 
-def view(model : int):# -> Maybe Msg
+def view(model : imDict):# -> Maybe Msg
     print("Current app state")
     print(model)
     print("Awaiting next command . . .")

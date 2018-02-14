@@ -1,4 +1,3 @@
-
 # constants ------------------------------------------------------------------
 
 msgCode = '''class Msg:
@@ -31,7 +30,7 @@ def msgType(tagger : str, description : str,
 
     Usage:
 
-    >>> from tea import msgType
+    >>> from tea.msgFactory import msgType
     >>> msgType('Dec', 'message to decrease count', globals(), {})
     >>> x = Dec() # since created class got inserted into present/current env's globals
     >>> assert x.description == 'message to decrease count'
@@ -47,9 +46,4 @@ def msgType(tagger : str, description : str,
         exec(msgCode, context)
     exec(classCode.format(tagger, description), context)
     return
-
-def beginnerProgram(updateFunc, appModel, viewFunc):
-    import inspect
-    ufs = inspect.getsource(updateFunc)
-    print(ufs[1])
 

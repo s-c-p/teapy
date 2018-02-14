@@ -10,7 +10,15 @@ class SwitchError(RuntimeError):
 
 @contextmanager
 def switch(switchable, foreignContext):
+    # TODO: logging, ? use `logging.handler` to use sqlite
+    # DONE: duplicate-error
+    # TODO: non-exhaustive-error
+    #       implement some way to check that all subclasses
+    #       of Msg are accounted for, to find subclasses see:
+    #       so.com/q/2219998 so.com/q/5881873 so.com/q/3862310
+
     blocks = dict()
+
     # there might be a scenario where case_val IS the string `default`
     # to mitigate false positive in duplicate-default scan, we generate a
     # random string as key for holding actual default's responder function
@@ -44,8 +52,8 @@ def switch(switchable, foreignContext):
 
     # execute the desired function
     executeFn = blocks.get(switchable, defaultFn)
-    # logging.info("%s (%s) recieved with args-- %s", ???)
     foreignContext['switch_case_result'] = executeFn()
+    # logging.info("%s (%s) recieved with args-- %s", ???)
     return
 
 # tests
