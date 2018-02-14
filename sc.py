@@ -9,15 +9,13 @@ class SwitchError(RuntimeError):
     pass
 
 @contextmanager
-def switch(switchable):
-    #?scopes
+def switch(switchable, foreignContext):
     blocks = dict()
-
     # there might be a scenario where case_val IS the string `default`
     # to mitigate false positive in duplicate-default scan, we generate a
     # random string as key for holding actual default's responder function
-    defaultCaseKey = str(uuid.uuid4())
-    blocks[defaultCaseKey] = None
+    default_case = str(uuid.uuid4())
+    blocks[default_case] = None
 
     def case(case_val):
         def decorator(func):
@@ -31,42 +29,87 @@ def switch(switchable):
         return decorator
 
     def default(func):
-        if blocks[defaultCaseKey] is None:
-            blocks[defaultCaseKey] = func # first assignment
+        if blocks[default_case] is None:
+            blocks[default_case] = func # first assignment
         else:
             raise SwitchError("Repeated default case")
         return func
 
-    yield (case, default)
+    yield case, default
 
-    if blocks[defaultCaseKey] is None:
-        raise SwitchError("you did not handle the default clause of switch-case")
+    if blocks[default_case] is None:
+        raise SwitchError("you didn't handle the default clause of switch-case")
     else:
-        defaultFn = blocks[defaultCaseKey]
+        defaultFn = blocks[default_case]
 
     # execute the desired function
     executeFn = blocks.get(switchable, defaultFn)
-    logging.info("%s (%s) recieved with args-- %s", ???)
-    executeFn()
+    # logging.info("%s (%s) recieved with args-- %s", ???)
+    foreignContext['switch_case_result'] = executeFn()
     return
 
 # tests
 
-def test_switch():
-    x = 5
-    with switch(x) as cdTuple:
-        case, default = cdTuple
-
+def switch_example(x):
+    with switch(x, locals()) as (case, default):
         @case(4)
-        def _():
-            print("too less")
+        def _(): return "too less"
 
         @case(5)
-        def _():
-            print("yes")
+        def _(): return "yes"
 
         @default
-        def _():
-            print('no match found')
+        def _(): return 'no match found'
+    return locals()['switch_case_result']
+
+# tests ----------------------------------------------------------------------
+
+import pytest
+
+def test_switch():
+    assert switch_example(5) == "yes"
+    assert switch_example(4) == "too less"
+    assert switch_example('improbable case') == "no match found"
+    return
+
+def test_switch__case_repeat():
+    with pytest.raises(SwitchError) as exc:
+        x = str()
+        with switch(x, locals()) as (case, default):
+            @case('a')
+            def _():    pass
+            @case('b')
+            def _():    pass
+            @case('a')
+            def _():    pass
+            @default
+            def _():    pass
+    assert str(exc.value) == "Repeated case: a"
+    return
+
+def test_switch__default_repeat():
+    with pytest.raises(SwitchError) as exc:
+        x = str()
+        with switch(x, locals()) as (case, default):
+            @case('a')
+            def _():    pass
+            @case('b')
+            def _():    pass
+            @default
+            def _():    print('nice day')
+            @default
+            def _():    pass
+    assert str(exc.value) == "Repeated default case"
+    return
+
+def test_switch__default_clause_missing():
+    with pytest.raises(SwitchError) as exc:
+        x = str()
+        with switch(x, locals()) as (case, default):
+            @case('a')
+            def _():    pass
+            @case('b')
+            def _():    pass
+    assert str(exc.value) == "you didn't handle the default clause of switch-case"
     return
 
