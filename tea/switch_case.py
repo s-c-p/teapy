@@ -31,10 +31,6 @@ def switch(switchable, returnNamespace, foreignContext):
             try:
                 blocks[case_val]
             except KeyError:
-                # ensure case_val is a defined Msg type
-                # i.e. case_val is derived from Msg
-                # if case_val.__bases__
-                pdb.set_trace()
                 blocks[case_val] = func # first assignment
             else:                       # means key:value pair already existed
                 raise SwitchError("Repeated case: %s" % case_val)
@@ -50,14 +46,25 @@ def switch(switchable, returnNamespace, foreignContext):
 
     yield case, default
 
+    # Msg is hardcoded below, but this suits our project
+    msgSH = foreignContext['Msg'] # so I don't have to type RHS again & again
+
+    # ensure case_val is a defined Msg type
+    # i.e. each case_val is derived directly from Msg
+    for case_val in blocks.keys():
+        if type(case_val) is str:
+            continue
+        else:
+            bases = case_val.__bases__
+            if msgSH in bases and len(bases) == 1:
+                pass
+            else:
+                raise SwitchError(case_val + " is not a derived directly from Msg but from "+ bases)
+
     # check if all possible cases are covered
-    allCases = foreignContext['Msg'].__subclasses__()
+    allCases = msgSH.__subclasses__()
     # if set(allCases).??(blocks.??):
-    # TODO: remove all cases which are not directly derived from Msg
     # above approach is hardcoded but strict (for project purpose)
-    # a broader approach would be to
-    # find parent classes of all cases then find exhaustive case list
-    # by SuperClass1.__subclasses__() + SuperClass2.__subclasses__() ...
 
     if blocks[default_case] is None:
         raise SwitchError("you didn't handle the default clause of switch-case")
@@ -75,6 +82,7 @@ def switch(switchable, returnNamespace, foreignContext):
         if isinstance(switchable, key):
             executeFn = value
             break
+
     # execute the desired function
     returnNamespace['switch_case_result'] = executeFn()
     # logging.info("%s (%s) recieved with args-- %s", ???)
