@@ -87,7 +87,15 @@ def switch(switchable, returnNamespace, foreignContext):
     # function to be executed
     executeFn = defaultFn
     for key, value in blocks.items():
-        if isinstance(switchable, foreignContext[key]):
+        # I can't get an associated func by `blocks[Inc]` or `blocks['Inc']`
+        # because the keys are class representations, something like:
+        #   <class '__main__.Inc'>
+        # and not simple strings, so I have to do
+        # `blocks[foreignContext['Inc']]` to get the associated function.
+        # Now, since we are in a loop and we can not know all msgType names in
+        # advance (like Inc, Dec, etc.) we handle it programatically using
+        # `foreignContext[key.__name__]`
+        if isinstance(switchable, foreignContext[key.__name__]):
             executeFn = value
             break
 
