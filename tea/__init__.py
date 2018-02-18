@@ -1,3 +1,3 @@
 import pysistence as imm
 
-appState = pysistence.persistent_dict.PDict
+appState = imm.persistent_dict.PDict
