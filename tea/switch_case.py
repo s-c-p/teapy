@@ -9,7 +9,7 @@ class SwitchError(RuntimeError):
     pass
 
 @contextmanager
-def switch(switchable, foreignContext):
+def switch(switchable, returnNamespace, foreignContext):
     # TODO: logging, ? use `logging.handler` to use sqlite
     # DONE: duplicate-error
     # TODO: non-exhaustive-error
@@ -45,6 +45,13 @@ def switch(switchable, foreignContext):
 
     yield case, default
 
+    # check if all possible cases are covered
+    allCases = foreignContext['Msg'].__subclasses__()
+    # above approach is hardcoded but strict (for project purpose)
+    # a broader approach would be to
+    # find parent classes of all cases then find exhaustive case list
+    # by SuperClass1.__subclasses__() + SuperClass2.__subclasses__() ...
+
     if blocks[default_case] is None:
         raise SwitchError("you didn't handle the default clause of switch-case")
     else:
@@ -52,13 +59,13 @@ def switch(switchable, foreignContext):
 
     # execute the desired function
     executeFn = blocks.get(switchable, defaultFn)
-    foreignContext['switch_case_result'] = executeFn()
+    returnNamespace['switch_case_result'] = executeFn()
     # logging.info("%s (%s) recieved with args-- %s", ???)
     return
 
 # tests ----------------------------------------------------------------------
 
-import pytest
+# import pytest
 
 def switch_example(x):
     with switch(x, locals()) as (case, default):
