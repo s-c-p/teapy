@@ -1,5 +1,6 @@
-import pysistence
+from tea import imm, appState
 from tea.msgFactory import msgType
+from tea.switch_case import switch
 
 import funcy
 # bit.ly/2CcnB7M
@@ -7,18 +8,15 @@ import funcy
 
 # Model
 
-# type alias
-imDict = pysistence.persistent_dict.PDict
-
-model : imDict
-model = pysistence.make_dict(value=int())
+model : appState
+model = imm.make_dict(value=int())
 
 # update
 
 msgType("Inc", "message to increase count", globals(), {})
 msgType("Dec", "message to decrease count", globals(), {})
 
-def update(msg : Msg, model : imDict) -> imDict:
+def update(msg : Msg, model : appState) -> appState:
     """ TODO: (low-priority, academic value) somehow implement the
     `let tempVars in evaluatedExpression`, perhaps with contextmanager
     """
@@ -38,7 +36,7 @@ def update(msg : Msg, model : imDict) -> imDict:
 
 # view
 
-def view(model : imDict):# -> Maybe Msg
+def view(model : appState):# -> Maybe Msg
     print("Current app state")
     print(model)
     print("Awaiting next command . . .")
