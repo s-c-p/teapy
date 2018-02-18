@@ -59,8 +59,18 @@ def switch(switchable, returnNamespace, foreignContext):
     else:
         defaultFn = blocks[default_case]
 
+    # a simple:
+    # executeFn = blocks.get(switchable, defaultFn)
+    # won't work in our case because switchable is an instance
+    # (carrying values) of Msg's subclass not a raw/builtin data
+    # type so we need to use `isinstance` to single out the
+    # function to be executed
+    executeFn = defaultFn
+    for key, value in blocks.items():
+        if isinstance(switchable, key):
+            executeFn = value
+            break
     # execute the desired function
-    executeFn = blocks.get(switchable, defaultFn)
     returnNamespace['switch_case_result'] = executeFn()
     # logging.info("%s (%s) recieved with args-- %s", ???)
     return
