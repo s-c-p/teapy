@@ -1,0 +1,10 @@
+why do i have to repeat myself, is it possible (just asking)
+	that fns automatically fill in the callers globals n locals
+	without me having to fill those
+
+? remove default from tea.switch_case.switch, it is redundant
+	since all cases are msg derivatives and all must be handled
+
+message choice in argument list of tea.msgFactory.msgType
+	but than i'll have to track for clashes
+
