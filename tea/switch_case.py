@@ -77,7 +77,7 @@ def switch(switchable, returnNamespace, foreignContext):
     if blocks[default_case] is None:
         raise SwitchError("you didn't handle the default clause of switch-case")
     else:
-        defaultFn = blocks[default_case]
+        defaultFn = blocks.pop(default_case)
 
     # a simple:
     # executeFn = blocks.get(switchable, defaultFn)
