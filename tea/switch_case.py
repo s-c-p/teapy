@@ -47,6 +47,8 @@ def switch(switchable, returnNamespace, foreignContext):
 
     # check if all possible cases are covered
     allCases = foreignContext['Msg'].__subclasses__()
+    if set(allCases).??(blocks.??):
+    # TODO: remove all cases which are not directly derived from Msg
     # above approach is hardcoded but strict (for project purpose)
     # a broader approach would be to
     # find parent classes of all cases then find exhaustive case list
