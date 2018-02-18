@@ -13,7 +13,7 @@ class SwitchError(RuntimeError):
 def switch(switchable, returnNamespace, foreignContext):
     # TODO: logging, ? use `logging.handler` to use sqlite
     # DONE: duplicate-error
-    # TODO: non-exhaustive-error
+    # DONE: non-exhaustive-error
     #       implement some way to check that all subclasses
     #       of Msg are accounted for, to find subclasses see:
     #       so.com/q/2219998 so.com/q/5881873 so.com/q/3862310
@@ -46,13 +46,16 @@ def switch(switchable, returnNamespace, foreignContext):
 
     yield case, default
 
-    # Msg is hardcoded below, but this suits our project
-    msgSH = foreignContext['Msg'] # so I don't have to type RHS again & again
+    # `pdb.set_trace()`ing shows that `Msg`, or any key in `blocks`, is not
+    # defined "here" and raises NameError. But if I call it on caller's
+    # globals() i.e. `foreignContext` it works as just as expected
+    msgSH = foreignContext['Msg']           # messageShorthand
+    # Msg is hardcoded above, but this suits our project
 
-    # ensure case_val is a defined Msg type
-    # i.e. each case_val is derived directly from Msg
+    # ensure all case_val are Msg type
+    # i.e. each case_val is derived directly from Msg and no str/int/etc.
     for case_val in blocks.keys():
-        if type(case_val) is str:
+        if case_val == default_case:
             continue
         else:
             bases = case_val.__bases__
@@ -62,9 +65,14 @@ def switch(switchable, returnNamespace, foreignContext):
                 raise SwitchError(case_val + " is not a derived directly from Msg but from "+ bases)
 
     # check if all possible cases are covered
-    allCases = msgSH.__subclasses__()
-    # if set(allCases).??(blocks.??):
-    # above approach is hardcoded but strict (for project purpose)
+    emptySet = set()
+    allCases = blocks.keys()
+    possibilities = msgSH.__subclasses__()
+    cases_not_handled = set(possibilities).difference(set(allCases))
+    if cases_not_handled == emptySet:
+        pass
+    else:
+        raise SwitchError("following message cases are not handled" + cases_not_handled)
 
     if blocks[default_case] is None:
         raise SwitchError("you didn't handle the default clause of switch-case")
@@ -79,7 +87,7 @@ def switch(switchable, returnNamespace, foreignContext):
     # function to be executed
     executeFn = defaultFn
     for key, value in blocks.items():
-        if isinstance(switchable, key):
+        if isinstance(switchable, foreignContext[key]):
             executeFn = value
             break
 
