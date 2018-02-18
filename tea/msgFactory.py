@@ -1,3 +1,6 @@
+class MsgFactoryError(RuntimeError):
+    pass
+
 # constants ------------------------------------------------------------------
 
 msgCode = '''class Msg:
@@ -44,6 +47,11 @@ def msgType(tagger : str, description : str,
         pass
     else:
         exec(msgCode, context)
-    exec(classCode.format(tagger, description), context)
+    # ensure duplicate taggers are not created, cuz it'd defeat exhaustive
+    # case search in switch case thingy
+    if context.get(tagger) is None:
+        exec(classCode.format(tagger, description), context)
+    else:   # i.e. another tagger with same name was found in globals() of caller
+        raise MsgFactoryError("Duplicate message name %s found.\n(NOTE: tagger overloading is not allowed)")
     return
 
