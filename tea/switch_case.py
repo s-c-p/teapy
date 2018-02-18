@@ -56,23 +56,25 @@ def switch(switchable, foreignContext):
     # logging.info("%s (%s) recieved with args-- %s", ???)
     return
 
-# tests
+# tests ----------------------------------------------------------------------
+
+import pytest
 
 def switch_example(x):
     with switch(x, locals()) as (case, default):
         @case(4)
-        def _(): return "too less"
+        def _():
+            return "too less"
 
         @case(5)
-        def _(): return "yes"
+        def _():
+            return "yes"
 
         @default
-        def _(): return 'no match found'
+        def _():
+            return 'no match found'
+
     return locals()['switch_case_result']
-
-# tests ----------------------------------------------------------------------
-
-import pytest
 
 def test_switch():
     assert switch_example(5) == "yes"
@@ -85,13 +87,21 @@ def test_switch__case_repeat():
         x = str()
         with switch(x, locals()) as (case, default):
             @case('a')
-            def _():    pass
+            def _():
+                pass
+
             @case('b')
-            def _():    pass
+            def _():
+                pass
+
             @case('a')
-            def _():    pass
+            def _():
+                pass
+
             @default
-            def _():    pass
+            def _():
+                pass
+
     assert str(exc.value) == "Repeated case: a"
     return
 
@@ -100,13 +110,21 @@ def test_switch__default_repeat():
         x = str()
         with switch(x, locals()) as (case, default):
             @case('a')
-            def _():    pass
+            def _():
+                pass
+
             @case('b')
-            def _():    pass
+            def _():
+                pass
+
             @default
-            def _():    print('nice day')
+            def _():
+                print('nice day')
+
             @default
-            def _():    pass
+            def _():
+                pass
+
     assert str(exc.value) == "Repeated default case"
     return
 
@@ -115,9 +133,13 @@ def test_switch__default_clause_missing():
         x = str()
         with switch(x, locals()) as (case, default):
             @case('a')
-            def _():    pass
+            def _():
+                pass
+
             @case('b')
-            def _():    pass
+            def _():
+                pass
+
     assert str(exc.value) == "you didn't handle the default clause of switch-case"
     return
 
