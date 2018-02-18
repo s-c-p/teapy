@@ -1,3 +1,4 @@
+import pdb
 import uuid
 import logging
 from contextlib import contextmanager
@@ -30,6 +31,10 @@ def switch(switchable, returnNamespace, foreignContext):
             try:
                 blocks[case_val]
             except KeyError:
+                # ensure case_val is a defined Msg type
+                # i.e. case_val is derived from Msg
+                # if case_val.__bases__
+                pdb.set_trace()
                 blocks[case_val] = func # first assignment
             else:                       # means key:value pair already existed
                 raise SwitchError("Repeated case: %s" % case_val)
@@ -47,7 +52,7 @@ def switch(switchable, returnNamespace, foreignContext):
 
     # check if all possible cases are covered
     allCases = foreignContext['Msg'].__subclasses__()
-    if set(allCases).??(blocks.??):
+    # if set(allCases).??(blocks.??):
     # TODO: remove all cases which are not directly derived from Msg
     # above approach is hardcoded but strict (for project purpose)
     # a broader approach would be to
