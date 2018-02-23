@@ -53,7 +53,7 @@ def cmd_print(mapping):
     pprint(pbl)
     return
 
-def doFittingOf(class_):
+def dissect(class_):
     print(class_.__doc__)
     import pdb
     pdb.set_trace()
@@ -63,7 +63,8 @@ def smart_input(mapping):
     ans = input("cmd> ")
     for k, v in mapping.items():
         if ans in v:
-            doFittingOf(class_=k)
+            argNames = dissect(class_=k)
+            return asi(argNames)
     print("sorry, I couldn't map your input to a message, please try again")
     return None
 

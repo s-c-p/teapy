@@ -24,7 +24,7 @@ class {className}(Msg):
 # function defs -------------------------------------------------------------- 
 
 def msgType(tagger : str, description : str,
-            context : dict, argTypeList : list):
+        context : dict, args : list, types : list):
     """ create class `tagger` derived from Msg with
     docstring being `description` in foreign-namespace `context`
 
@@ -56,15 +56,14 @@ def msgType(tagger : str, description : str,
     # ensure duplicate taggers are not created, cuz it'd defeat exhaustive
     # case search in switch case thingy
     if context.get(tagger) is None:
-        args = [n for n in argTypeList.keys()]
-        argTypes = [t.__name__ for t in argTypeList.values()]
+        types = [t.__name__ for t in types]
         doc_string = description + "\n" \
-                + "\n".join(["%s\t%s" % (k, v) for k, v in zip(args, argTypes)])
+                + "\n".join(["%s\t%s" % (k, v) for k, v in zip(args, types)])
         exec(
                 classCode.format(
                     className=tagger,
                     doc_string=doc_string,
-                    argTypes=", ".join(argTypes),
+                    argTypes=", ".join(types),
                     args=", ".join(args)
                     ),
                 context

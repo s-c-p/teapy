@@ -20,18 +20,19 @@ def msgHandling(arg : tuple):
 
 # Model
 
-model = imm.make_dict(content=str())
+model = imm.make_dict({ 'content' : str, 'revLenLimit' : int })
 
 # update
 
 msgType("Change",
         "message to tag change in string",
         globals(),
-        { 'content' : str })
+        ['content', 'revLenLimit'],
+        [str, int])
 msgType("Quit",
         "message to increase count",
         globals(),
-        dict())
+        [], [])
 
 @enforceTypes(Msg, appState)
 def update(msg, model) -> appState:
