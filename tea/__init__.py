@@ -48,16 +48,22 @@ def enforceTypes(*argTypeList):
 
 def cmd_print(mapping):
     'print mapping in --help fmt'
+    pbl = {k.__name__ : v for k, v in mapping.items()}
     from pprint import pprint
-    pprint(mapping)
+    pprint(pbl)
     return
+
+def doFittingOf(class_):
+    print(class_.__doc__)
+    import pdb
+    pdb.set_trace()
 
 def smart_input(mapping):
     cmd_print(mapping)
     ans = input("cmd> ")
     for k, v in mapping.items():
         if ans in v:
-            return k()
+            doFittingOf(class_=k)
     print("sorry, I couldn't map your input to a message, please try again")
     return None
 

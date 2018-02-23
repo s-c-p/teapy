@@ -13,11 +13,11 @@ class Msg:
 '''
 
 classCode = '''
-class {0}(Msg):
-    """ {1} """
-    @enforceTypes(object, {2})
-    def __init__(self, {3}):
-        super({0}, self).__init__(self.__doc__)
+class {className}(Msg):
+    """ {doc_string} """
+    @enforceTypes(object, {argTypes})
+    def __init__(self, {args}):
+        super({className}, self).__init__(self.__doc__)
 
 '''
 
@@ -56,9 +56,19 @@ def msgType(tagger : str, description : str,
     # ensure duplicate taggers are not created, cuz it'd defeat exhaustive
     # case search in switch case thingy
     if context.get(tagger) is None:
-        atl = ", ".join([t.__name__ for t in argTypeList.values()])
-        anl = ", ".join([n for n in argTypeList.keys()])
-        exec(classCode.format(tagger, description, atl, anl), context)
+        args = [n for n in argTypeList.keys()]
+        argTypes = [t.__name__ for t in argTypeList.values()]
+        doc_string = description + "\n" \
+                + "\n".join(["%s\t%s" % (k, v) for k, v in zip(args, argTypes)])
+        exec(
+                classCode.format(
+                    className=tagger,
+                    doc_string=doc_string,
+                    argTypes=", ".join(argTypes),
+                    args=", ".join(args)
+                    ),
+                context
+                )
     else:   # i.e. another tagger with same name was found in globals() of caller
         raise MsgFactoryError("Duplicate message name %s found.\n(NOTE: tagger overloading is not allowed)")
     return

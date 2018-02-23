@@ -20,7 +20,6 @@ def msgHandling(arg : tuple):
 
 # Model
 
-model : appState
 model = imm.make_dict(content=str())
 
 # update
@@ -55,7 +54,8 @@ def view(model : appState):# -> Maybe Msg
     print(model)
     print("Awaiting next command . . .")
     mapping = \
-        { Quit : ["q", "Q", "quit", "exit", "bye"]
+        { Change : ["c", "C", "change"]
+        , Quit : ["q", "Q", "quit", "exit", "bye"]
         }
     pmReadyObj = smart_input(mapping)
     if pmReadyObj is None:
