@@ -32,6 +32,20 @@ class PubSub():
 
 
 
+def enforceTypes(*argTypeList):
+    def wrapper(func):
+        def wrapped(*args):
+            if len(args) > len(argTypeList):
+                raise TypeError("%s() takes at most %s non-keyword arguments (%s given)" % (func.__name__, len(argTypeList), len(args)))
+            argspairs = zip(args, argTypeList)
+            for param, expected in argspairs:
+                if param is not None and not isinstance(param, expected):
+                    raise TypeError("Parameter '%s' is not %s" \
+                        % (param, expected.__name__))
+            return func(*args)
+        return wrapped
+    return wrapper
+
 def cmd_print(mapping):
     'print mapping in --help fmt'
     from pprint import pprint

@@ -1,19 +1,24 @@
+# from tea import enforceTypes
+
 class MsgFactoryError(RuntimeError):
     pass
 
 # constants ------------------------------------------------------------------
 
-msgCode = '''class Msg:
+msgCode = '''
+class Msg:
     def __init__(self, description):
         self.description = description
         return
 '''
 
-classCode = '''class {0}(Msg):
+classCode = '''
+class {0}(Msg):
     """ {1} """
     @enforceTypes(object, {2})
-    def __init__(self):
+    def __init__(self, {3}):
         super({0}, self).__init__(self.__doc__)
+
 '''
 
 # function defs -------------------------------------------------------------- 
@@ -51,8 +56,9 @@ def msgType(tagger : str, description : str,
     # ensure duplicate taggers are not created, cuz it'd defeat exhaustive
     # case search in switch case thingy
     if context.get(tagger) is None:
-        atl = ", ".join(argTypeList)
-        exec(classCode.format(tagger, description, atl), context)
+        atl = ", ".join([t.__name__ for t in argTypeList.values()])
+        anl = ", ".join([n for n in argTypeList.keys()])
+        exec(classCode.format(tagger, description, atl, anl), context)
     else:   # i.e. another tagger with same name was found in globals() of caller
         raise MsgFactoryError("Duplicate message name %s found.\n(NOTE: tagger overloading is not allowed)")
     return
@@ -64,16 +70,4 @@ def msgType(tagger : str, description : str,
 
 
 
-def enforceTypes(*argTypeList):
-    def wrapper(func):
-        def wrapped(*args):
-            if len(args) > len(argTypeList):
-                raise TypeError("%s() takes at most %s non-keyword arguments (%s given)" % (func.__name__, len(argTypeList), len(args)))
-            argspairs = zip(args, argTypeList)
-            for param, expected in argspairs:
-                if param is not None and not isinstance(param, expected):
-                    raise TypeError("Parameter '%s' is not %s" % (param, expected.__name__))
-            return func(*args)
-        return wrapped
-    return wrapper
 

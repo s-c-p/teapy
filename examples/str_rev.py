@@ -1,14 +1,16 @@
 import pdb
-from tea import imm, appState, PubSub, smart_input
+from tea import imm, appState, PubSub, smart_input, enforceTypes
 from tea.msgFactory import msgType
 from tea.switch_case import switch
 
 pubsub = PubSub()
 
+@enforceTypes(appState)
 def updateHandling(model : appState):
     view(model)
     return
 
+@enforceTypes(tuple)
 def msgHandling(arg : tuple):
     msg, model = arg
     update(msg, model)
@@ -19,14 +21,21 @@ def msgHandling(arg : tuple):
 # Model
 
 model : appState
-model = imm.make_dict(value=int())
+model = imm.make_dict(content=str())
 
 # update
 
-msgType("Change", "message to tag change in string", globals(), {})
-msgType("Quit", "message to increase count", globals(), {})
+msgType("Change",
+        "message to tag change in string",
+        globals(),
+        { 'content' : str })
+msgType("Quit",
+        "message to increase count",
+        globals(),
+        dict())
 
-def update(msg : Msg, model : appState) -> appState:
+@enforceTypes(Msg, appState)
+def update(msg, model) -> appState:
     with switch(msg, locals(), globals()) as (case, default):
         @case(Quit)
         def _():
@@ -40,6 +49,7 @@ def update(msg : Msg, model : appState) -> appState:
 
 # view
 
+@enforceTypes(appState)
 def view(model : appState):# -> Maybe Msg
     print("Current app state")
     print(model)
