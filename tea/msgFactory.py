@@ -20,7 +20,12 @@ class {className}(Msg):
         super({className}, self).__init__(self.__doc__)
         self.args = args
     def pattern_match(self):
-        return self.args
+        # if i don't do the below then in caller
+        # we'll have singleArg == (arg[0],) i.e. tuple not unpacked
+        if len(self.args) == 1:
+            return self.args[0]
+        else:
+            return self.args
 '''
 
 # function defs -------------------------------------------------------------- 
