@@ -71,6 +71,7 @@ model = imm.make_dict(value=int())
 
 msgType("Inc", "message to increase count", globals(), {})
 msgType("Dec", "message to decrease count", globals(), {})
+msgType("Quit", "message to increase count", globals(), {})
 
 def update(msg : Msg, model : appState) -> appState:
     """ TODO: (low-priority, academic value) somehow implement the
@@ -85,6 +86,9 @@ def update(msg : Msg, model : appState) -> appState:
         def _():
             old = model['value']
             return model.using(value=old-1)
+        @case(Quit)
+        def _():
+            exit(0)
         @default
         def _():
             raise RuntimeError("Unknow msg recieved")
@@ -101,6 +105,7 @@ def view(model : appState):# -> Maybe Msg
     mapping = \
         { Inc : ["+", "increase", "up", "more"]
         , Dec : ["-", "decrease", "down", "less"]
+        , Quit : ["q", "Q", "quit", "exit", "bye"]
         }
     pmReadyObj = smart_input(mapping) # inspect key-obj's code, enforce type, make msg object
     if pmReadyObj is None:
