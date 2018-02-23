@@ -1,5 +1,5 @@
 import pdb
-from tea import imm, appState, PubSub, smart_input, enforceTypes
+from tea import *
 from tea.msgFactory import msgType
 from tea.switch_case import switch
 
@@ -20,6 +20,7 @@ def msgHandling(arg : tuple):
 
 # Model
 
+model : appState
 model = imm.make_dict({ 'content' : str, 'revLenLimit' : int })
 
 # update

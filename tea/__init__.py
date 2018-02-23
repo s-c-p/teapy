@@ -1,5 +1,7 @@
 import pysistence as imm
 
+# __all__ = [imm, appState, PubSub, smart_input, enforceTypes]
+
 appState = imm.persistent_dict.PDict
 
 class PubSub():
@@ -48,18 +50,30 @@ def enforceTypes(*argTypeList):
 
 def _cmd_print(mapping):
     'print mapping in --help fmt'
+    import shutil
+    xLim, _ = shutil.get_terminal_size()
     pbl = {k.__name__ : v for k, v in mapping.items()}
-    from pprint import pprint
-    pprint(pbl)
+    xMax = max(list(map(len, pbl.keys())))
+    if xMax > xLim*0.4:
+        xMax = 6
+        headF = "{className}\n" + " "*9 +  "{doc_string}"
+    else:
+        headF = "{className}   {doc_string}"
+    bodyF = " "*xMax + " "*3 + " - {cmd}"
+    for (k, v), c in zip(pbl.items(), mapping.keys()):
+        d = c.__doc__.split('\n')[0].strip()
+        print(headF.format(className=k, doc_string=d))
+        for cmd in v:
+            print(bodyF.format(cmd=cmd))
+        print()
     return
 
 def _actually_smart_input(class_):
     args = class_.__doc__.split('\n')[-1].strip().split()
     # to see how above line makes sense, see how class doc is made in
-    # msgFactory
+    # tea/msgFactory.py
     if args:
         inputs = list()
-        import pdb
         for i, arg in enumerate(args):
             inp = input("Enter argument #%s: " % str(i+1))
             # dynamic type casting, so.com/q/11775460
