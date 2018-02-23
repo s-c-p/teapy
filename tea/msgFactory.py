@@ -19,7 +19,7 @@ class {className}(Msg):
     def __init__(self, *args):
         super({className}, self).__init__(self.__doc__)
         self.args = args
-    def patter_match(self):
+    def pattern_match(self):
         return self.args
 '''
 

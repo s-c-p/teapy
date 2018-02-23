@@ -1,4 +1,3 @@
-import pdb
 from tea import *
 from tea.msgFactory import msgType
 from tea.switch_case import switch
@@ -21,19 +20,23 @@ def msgHandling(arg : tuple):
 # Model
 
 model : appState
-model = imm.make_dict({ 'content' : str, 'revLenLimit' : int })
+model = imm.make_dict(content=str())
 
 # update
 
 msgType("Change",
-        [str, int],
+        [str],
         "message to tag change in string",
         globals())
-msgType("Quit", [], "message to increase count", globals())
+msgType("Quit", [], "message to exit this program", globals())
 
 @enforceTypes(Msg, appState)
 def update(msg, model) -> appState:
     with switch(msg, locals(), globals()) as (case, default):
+        @case(Change)
+        def _():
+            incm = msg.pattern_match()
+            return model.using(content=incm)
         @case(Quit)
         def _():
             exit(0)
