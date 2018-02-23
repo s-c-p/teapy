@@ -46,25 +46,35 @@ def enforceTypes(*argTypeList):
         return wrapped
     return wrapper
 
-def cmd_print(mapping):
+def _cmd_print(mapping):
     'print mapping in --help fmt'
     pbl = {k.__name__ : v for k, v in mapping.items()}
     from pprint import pprint
     pprint(pbl)
     return
 
-def dissect(class_):
-    print(class_.__doc__)
-    import pdb
-    pdb.set_trace()
+def _actually_smart_input(class_):
+    args = class_.__doc__.split('\n')[-1].strip().split()
+    # to see how above line makes sense, see how class doc is made in
+    # msgFactory
+    if args:
+        inputs = list()
+        import pdb
+        for i, arg in enumerate(args):
+            inp = input("Enter argument #%s: " % str(i+1))
+            # dynamic type casting, so.com/q/11775460
+            validArg = __builtins__[arg](inp)
+            inputs.append(validArg)
+        return class_(*inputs)
+    else:
+        return class_()
 
 def smart_input(mapping):
-    cmd_print(mapping)
+    _cmd_print(mapping)
     ans = input("cmd> ")
     for k, v in mapping.items():
         if ans in v:
-            argNames = dissect(class_=k)
-            return asi(argNames)
+            return _actually_smart_input(class_=k)
     print("sorry, I couldn't map your input to a message, please try again")
     return None
 

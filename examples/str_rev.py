@@ -25,14 +25,10 @@ model = imm.make_dict({ 'content' : str, 'revLenLimit' : int })
 # update
 
 msgType("Change",
+        [str, int],
         "message to tag change in string",
-        globals(),
-        ['content', 'revLenLimit'],
-        [str, int])
-msgType("Quit",
-        "message to increase count",
-        globals(),
-        [], [])
+        globals())
+msgType("Quit", [], "message to increase count", globals())
 
 @enforceTypes(Msg, appState)
 def update(msg, model) -> appState:

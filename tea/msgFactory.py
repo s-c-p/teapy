@@ -16,15 +16,16 @@ classCode = '''
 class {className}(Msg):
     """ {doc_string} """
     @enforceTypes(object, {argTypes})
-    def __init__(self, {args}):
+    def __init__(self, *args):
         super({className}, self).__init__(self.__doc__)
-
+        self.args = args
+    def patter_match(self):
+        return self.args
 '''
 
 # function defs -------------------------------------------------------------- 
 
-def msgType(tagger : str, description : str,
-        context : dict, args : list, types : list):
+def msgType(tagger : str, types : list, description : str, context : dict):
     """ create class `tagger` derived from Msg with
     docstring being `description` in foreign-namespace `context`
 
@@ -43,8 +44,6 @@ def msgType(tagger : str, description : str,
     >>> msgType('Dec', 'message to decrease count', globals(), {})
     >>> x = Dec() # since created class got inserted into present/current env's globals
     >>> assert x.description == 'message to decrease count'
-
-    TODO : implement argTypeList in __init__
     """
     # instead of doing:
     # context.update({'Msg' : globals()['Msg']})
@@ -57,14 +56,12 @@ def msgType(tagger : str, description : str,
     # case search in switch case thingy
     if context.get(tagger) is None:
         types = [t.__name__ for t in types]
-        doc_string = description + "\n" \
-                + "\n".join(["%s\t%s" % (k, v) for k, v in zip(args, types)])
+        doc_string = description + "\nparams like:\n\t" + " ".join(types)
         exec(
                 classCode.format(
                     className=tagger,
                     doc_string=doc_string,
-                    argTypes=", ".join(types),
-                    args=", ".join(args)
+                    argTypes=", ".join(types)
                     ),
                 context
                 )
