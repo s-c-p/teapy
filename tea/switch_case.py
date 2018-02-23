@@ -72,7 +72,11 @@ def switch(switchable, returnNamespace, foreignContext):
     if cases_not_handled == emptySet:
         pass
     else:
-        raise SwitchError("following message cases are not handled" + cases_not_handled)
+        mid = " is" if len(cases_not_handled) == 1 else "s are"
+        err = "following message case%s not handled\n\t" % mid
+        err+= "\n\t".join([x.__name__ for x in cases_not_handled]) \
+            + "\nin-- " + foreignContext['__file__']
+        raise SwitchError(err)
 
     if blocks[default_case] is None:
         raise SwitchError("you didn't handle the default clause of switch-case")
