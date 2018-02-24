@@ -1,5 +1,5 @@
 import pdb
-from tea import imm, appState, PubSub, smart_input
+from tea import *
 from tea.msgFactory import msgType
 from tea.switch_case import switch
 
@@ -19,13 +19,13 @@ def msgHandling(arg : tuple):
 # Model
 
 model : appState
-model = imm.make_dict(value=int())
+model = ImDict([('value', int, 0)])
 
 # update
 
-msgType("Inc", "message to increase count", globals(), {})
-msgType("Dec", "message to decrease count", globals(), {})
-msgType("Quit", "message to increase count", globals(), {})
+msgType("Inc", [], "message to increase count", globals())
+msgType("Dec", [], "message to decrease count", globals())
+msgType("Quit", [], "message to exit program", globals())
 
 def update(msg : Msg, model : appState) -> appState:
     """ TODO: (low-priority, academic value) somehow implement the
