@@ -1,3 +1,4 @@
+import pdb
 from tea import *
 from tea.msgFactory import msgType
 from tea.switch_case import switch
@@ -20,7 +21,7 @@ def msgHandling(arg : tuple):
 # Model
 
 model : appState
-model = ImDict(content=str())
+model = ImDict([('content', str, "")])
 
 # update
 
@@ -69,5 +70,6 @@ def view(model : appState):# -> Maybe Msg
 if __name__ == "__main__":
     pubsub.watch("update", "model change", updateHandling)
     pubsub.watch("view", "message emitted", msgHandling)
+    print('f')
     view(model)
 

@@ -1,9 +1,6 @@
 import copy
-import pdb
 
 # __all__ = [imm, appState, PubSub, smart_input, enforceTypes]
-
-appState = ImDict
 
 class PubSub():
 
@@ -33,6 +30,17 @@ class PubSub():
         else:
             raise RuntimeError("duplicate event handler fn assigned for " + key)
 
+
+def builder(dicn, schema_iterable):
+    build_info = list()
+    items = dicn.items()
+    types = schema_iterable
+    for (k, v), t in zip(items, types):
+        build_info.append(tuple([k, t, v]))
+    return build_info
+
+def not_implemented_method(*args, **kwargs):
+    raise TypeError('Cannot modify immutable type ImDict')    
 
 class ImDict(dict):
     pop = not_implemented_method
@@ -89,16 +97,7 @@ class ImDict(dict):
         build_info = builder(new_dict, self.schema.values())
         return ImDict(build_info)
 
-def builder(dicn, schema_iterable):
-    build_info = list()
-    items = dicn.items()
-    types = schema_iterable
-    for (k, v), t in zip(items, types):
-        build_info.append(tuple([k, t, v]))
-    return build_info
-
-def not_implemented_method(*args, **kwargs):
-    raise TypeError('Cannot modify immutable type ImDict')    
+appState = ImDict
 
 
 
