@@ -112,7 +112,7 @@ def enforceTypes(*argTypeList):
                 if param is not None and not isinstance(param, expected):
                     raise TypeError("Parameter '%s' is not %s" \
                             % (param, expected.__name__))
-                    return func(*args)
+            return func(*args)
         return wrapped
     return wrapper
 
