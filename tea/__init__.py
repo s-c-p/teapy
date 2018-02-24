@@ -1,11 +1,12 @@
-import pysistence as imm
+import copy
+import pdb
 
 # __all__ = [imm, appState, PubSub, smart_input, enforceTypes]
 
-appState = imm.persistent_dict.PDict
+appState = ImDict
 
 class PubSub():
-    
+
     def __init__(self):
         self.tracker = dict()
 
@@ -33,6 +34,74 @@ class PubSub():
             raise RuntimeError("duplicate event handler fn assigned for " + key)
 
 
+class ImDict(dict):
+    pop = not_implemented_method
+    clear = not_implemented_method
+    update = not_implemented_method
+    popitem = not_implemented_method
+    __setitem__ = not_implemented_method
+    __delitem__ = not_implemented_method
+
+    def __init__(self, build_info):
+        self._dicn = dict()
+        self.schema = dict()
+        for ktv in build_info:
+            key, type_, value = ktv
+            self._dicn[key] = value
+            self.schema[key] = type_
+        return
+
+    def __getitem__(self, key):
+        return self._dicn[key]
+
+    def __repr__(self):
+        return self._dicn.__repr__()
+
+    def __str__(self):
+        return self._dicn.__str__()
+
+    def _as_transient(self):
+        return copy.deepcopy(self._dicn)
+
+    def copy(self):
+        build_info = builder(self._dicn, self.schema.values())
+        return ImDict(build_info)
+
+    def without(self, *keys):
+        new_dict = self._as_transient()
+        new_schema = copy.deepcopy(self.schema)
+        for key in keys:
+            del new_dict[key]
+            del new_schema[key]
+        build_info = builder(new_dict, new_schema.values())
+        return ImDict(build_info)
+
+    def using(self, **kwargs):
+        new_dict = self._as_transient()
+        for key, new_val in kwargs.items():
+            if isinstance(new_val, self.schema[key]):
+                new_dict[key] = new_val
+            else:
+                raise RuntimeError(
+                        "Value for %s key is supposed to be %s but it is %s" % \
+                        (key, self.schema[key].__name__, type(new_val))
+                    )
+        build_info = builder(new_dict, self.schema.values())
+        return ImDict(build_info)
+
+def builder(dicn, schema_iterable):
+    build_info = list()
+    items = dicn.items()
+    types = schema_iterable
+    for (k, v), t in zip(items, types):
+        build_info.append(tuple([k, t, v]))
+    return build_info
+
+def not_implemented_method(*args, **kwargs):
+    raise TypeError('Cannot modify immutable type ImDict')    
+
+
+
 
 def enforceTypes(*argTypeList):
     def wrapper(func):
@@ -43,8 +112,8 @@ def enforceTypes(*argTypeList):
             for param, expected in argspairs:
                 if param is not None and not isinstance(param, expected):
                     raise TypeError("Parameter '%s' is not %s" \
-                        % (param, expected.__name__))
-            return func(*args)
+                            % (param, expected.__name__))
+                    return func(*args)
         return wrapped
     return wrapper
 

@@ -20,7 +20,7 @@ def msgHandling(arg : tuple):
 # Model
 
 model : appState
-model = imm.make_dict(content=str())
+model = ImDict(content=str())
 
 # update
 
