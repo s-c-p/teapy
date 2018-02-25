@@ -1,3 +1,4 @@
+from tea import *
 from tea.msgFactory import msgType
 from tea.switch_case import switch
 
