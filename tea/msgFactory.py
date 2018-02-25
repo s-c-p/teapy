@@ -46,7 +46,7 @@ def msgType(tagger : str, types : list, description : str, context : dict):
     Usage:
 
     >>> from tea.msgFactory import msgType
-    >>> msgType('Dec', 'message to decrease count', globals(), {})
+    >>> msgType('Dec', [], 'message to decrease count', globals())
     >>> x = Dec() # since created class got inserted into present/current env's globals
     >>> assert x.description == 'message to decrease count'
     """

@@ -1,20 +1,8 @@
-import pdb
 from tea import *
 from tea.msgFactory import msgType
 from tea.switch_case import switch
 
 pubsub = PubSub()
-
-def updateHandling(model : appState):
-    view(model)
-    return
-
-def msgHandling(arg : tuple):
-    msg, model = arg
-    update(msg, model)
-    return
-
-# ----------------------------------------------------------------------------
 
 # Model
 
@@ -28,9 +16,6 @@ msgType("Dec", [], "message to decrease count", globals())
 msgType("Quit", [], "message to exit program", globals())
 
 def update(msg : Msg, model : appState) -> appState:
-    """ TODO: (low-priority, academic value) somehow implement the
-    `let tempVars in evaluatedExpression`, perhaps with contextmanager
-    """
     with switch(msg, locals(), globals()) as (case, default):
         @case(Inc)
         def _():
@@ -67,6 +52,17 @@ def view(model : appState):# -> Maybe Msg
     else:
         message = pmReadyObj
         pubsub.notify(sender="view", event="message emitted", navai=(message, model))
+    return
+
+# ----------------------------------------------------------------------------
+
+def updateHandling(model : appState):
+    view(model)
+    return
+
+def msgHandling(arg : tuple):
+    msg, model = arg
+    update(msg, model)
     return
 
 if __name__ == "__main__":

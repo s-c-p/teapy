@@ -5,19 +5,6 @@ from tea.switch_case import switch
 
 pubsub = PubSub()
 
-@enforceTypes(appState)
-def updateHandling(model : appState):
-    view(model)
-    return
-
-@enforceTypes(tuple)
-def msgHandling(arg : tuple):
-    msg, model = arg
-    update(msg, model)
-    return
-
-# ----------------------------------------------------------------------------
-
 # Model
 
 model : appState
@@ -65,6 +52,19 @@ def view(model : appState):# -> Maybe Msg
     else:
         message = pmReadyObj
         pubsub.notify(sender="view", event="message emitted", navai=(message, model))
+    return
+
+# ----------------------------------------------------------------------------
+
+@enforceTypes(appState)
+def updateHandling(model : appState):
+    view(model)
+    return
+
+@enforceTypes(tuple)
+def msgHandling(arg : tuple):
+    msg, model = arg
+    update(msg, model)
     return
 
 if __name__ == "__main__":

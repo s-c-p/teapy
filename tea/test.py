@@ -1,8 +1,8 @@
 from tea.msgFactory import msgType
 from tea.switch_case import switch
 
-msgType('Inc', 'vsra', globals(), {})
-msgType('Dec', '2sra', globals(), {})
+msgType('Inc', [], 'vsra', globals())
+msgType('Dec', [], '2sra', globals())
 
 y = Dec()
 
