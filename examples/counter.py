@@ -1,8 +1,7 @@
 from tea import *
 from tea.msgFactory import msgType
 from tea.switch_case import switch
-
-pubsub = PubSub()
+from tea.programs import beginnerProgram
 
 # Model
 
@@ -32,8 +31,7 @@ def update(msg : Msg, model : appState) -> appState:
         def _():
             raise RuntimeError("Unknow msg recieved")
     ans = locals()['switch_case_result']
-    pubsub.notify(sender="update", event="model change", navai=ans)
-    return
+    return ans
 
 # view
 
@@ -47,26 +45,10 @@ def view(model : appState):# -> Maybe Msg
         , Quit : ["q", "Q", "quit", "exit", "bye"]
         }
     pmReadyObj = smart_input(mapping) # inspect key-obj's code, enforce type, make msg object
-    if pmReadyObj is None:
-        view(model)
-    else:
-        message = pmReadyObj
-        pubsub.notify(sender="view", event="message emitted", navai=(message, model))
-    return
+    return pmReadyObj
 
 # ----------------------------------------------------------------------------
 
-def updateHandling(model : appState):
-    view(model)
-    return
-
-def msgHandling(arg : tuple):
-    msg, model = arg
-    update(msg, model)
-    return
-
 if __name__ == "__main__":
-    pubsub.watch("update", "model change", updateHandling)
-    pubsub.watch("view", "message emitted", msgHandling)
-    view(model)
+    beginnerProgram(model, view, update)
 
