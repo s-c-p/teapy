@@ -1,6 +1,6 @@
 https://github.com/python-effect/effect
 
-enforce types in appState
+address bf42f81
 
 why do i have to repeat myself, is it possible (just asking)
 	that fns automatically fill in the callers globals n locals
