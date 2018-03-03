@@ -1,64 +1,32 @@
-import time
-import asyncio as aio
-
-def f(x):
-	time.sleep(1)
-	print("f says: " + str(x*2))
-	return x*2
-
-def s(x):
-	time.sleep(3)
-	print("s says: " + str(x*2))
-	return x**2
-
-x = 10
-
-f = aio.coroutine(f)
-s = aio.coroutine(s)
-
-assert aio.iscoroutinefunction(f)
-assert aio.iscoroutinefunction(s)
-
-futures = {f(x), s(x)}
-
-def executor():
-	yield from aio.wait(futures, return_when=aio.FIRST_COMPLETED)
-
-msg, _ = executor()
-
 class WhoeverSpeaksFirst(object):
     def __init__(self, *args):
         self.funcs = list(args)
 
     def given(self, *args):
-        for aFunc in self.funcs:
+        ''' run all functions in self.funcs parallel-ly
+        return as soon as any one of them gives an answer
+        while canceling execution of all other functions
+        '''
         return ans
 
-
-
-
-
-
-
-
 def program(initTuple, viewFn, updateFn, subscriptionFn):
-    msgType = foreignContext['Msg']
+    model, msg = initTuple
+    modelHasChanged = True
     while True:
-        navai = signals.pipeline.pop()
-        if isinstance(navai, msgType):
-            newAppState, nextCmdMsg = update(navai, appState)
-            if nextCmdMsg is None:
-                # signal that a new appState is available and put it in pipeline
-                continue
-            else:
-                # do both
-                # - signal that a new appState is available and put it in pipeline
-                # - while **async'lly** processing nextCmdMsg
-        elif isinstance(navai, appState):
-            msg = WhoeverSpeaksFirst(viewFn, subscriptionFn).given(appState)
-            signals.pipeline.append(msg)
+        if msg == None:
+            msg = WhoeverSpeaksFirst(viewFn, subscriptionFn).given(model)
         else:
-            raise RuntimeError('Unexpected stuff found in signals pipeline')
+            if modelHasChanged:
+                # tell mgr to blockingly execute viewFn(model) but not wait for Msg reply
+                # tell mgr to blockingly execute subscriptionFn(model) but not wait for Msg reply
+            else:
+                pass
+
+        # sync cuz clicks on model that's no longer valid are also invalid
+        # put a timeout ?
+        new_model, msg = updateFn(msg, model)
+        modelHasChanged = False if new_model == model else True
+        model = new_model
     return
 
 def beginnerProgram(model, viewFn, updateFn):
