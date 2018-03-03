@@ -18,14 +18,30 @@ def update(msg, model):
     return 'update'
 
 def view(model):
-    x = random.random()*2
-    time.sleep(x)
+    time.sleep(model)
+    print('view')
     return 0
 
 def subscriptions(model):
-    x = random.random()*2
-    time.sleep(x)
+    time.sleep(model)
+    print('subscriptions')
     return 0
+
+async def slf(rr):
+    t = [random.random()*2, random.random()*2]
+    random.shuffle(t)
+    from pprint import pprint as p
+    p(dict(zip(['view', 'subscriptions'], t)))
+    loop = asyncio.get_event_loop()
+    f1 = loop.run_in_executor(None, view, t[0])
+    f2 = loop.run_in_executor(None, subscriptions, t[1])
+    futures = set([f1, f2])
+    done, pending = await asyncio.wait(futures, return_when=asyncio.FIRST_COMPLETED)
+    rr.stop()
+    for _ in pending:
+        _.cancel()
+    return done
+
 
 import sys
 import logging
@@ -74,6 +90,9 @@ def pymotw():
         el.close()
 
 if __name__ == '__main__':
-    pymotw()
+    loop = asyncio.get_event_loop()
+    loop.create_task(slf(loop))
+    done = loop.run_forever()
+    print(done)
 
 
