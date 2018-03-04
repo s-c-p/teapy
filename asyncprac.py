@@ -96,3 +96,58 @@ if __name__ == '__main__':
     print(done)
 
 
+class MyPQ(queue.LifoQueue):
+    ''' simple FIFO q won't do it cuz model changing
+    so fastly OR model change requiring user pressing
+    enter (in CLI case) looks ugly
+    LIFO q seems to have nice property, except, consequent
+    get()s will take model back in history, '''
+    def get_nowait(self):
+        ans = super(MyPQ, self).get_nowait()
+        super(MyPQ, self).queue = []
+        return ans
+
+def program(init, view, update, subscriptions):
+    msgQ = queue.Queue()
+    stateQ = MyPQ()
+    model, msg = init
+    msgQ.put(msg)
+    stateQ.put(model)
+    with threads(3) as loops:
+        loop_1 = loops[0]
+        loop_2 = loops[1]
+        loop_3 = loops[2]
+
+        try:
+            latest_model = stateQ.get_nowait()
+        except queue.Empty:
+            latest_model = None
+
+        with loop_1:
+            try:
+                msg = msgQ.get_nowait()
+            except queue.Empty:
+                print('we\'ve achieved consistent state')
+            else:
+                model = latest_model
+                new_model, msg = update(msg, model)
+                if msg != None:
+                    msgQ.put(msg)
+                if new_model != model:
+                    stateQ.put(new_model)
+
+        with loop_2:
+            if latest_model == None:
+                pass
+            else:
+                msg = view(latest_model)
+                msgQ.put(msg)
+
+        with loop_3:
+            if latest_model == None:
+                pass
+            else:
+                msg = subscriptions(latest_model)
+                msgQ.put(msg)
+
+
