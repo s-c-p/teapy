@@ -1,0 +1,15 @@
+write `async def view` and `async def subs`, but currently struck at
+making `await input` work for view
+
+https://medium.freecodecamp.org/a-guide-to-asynchronous-programming-in-python-with-asyncio-232e2afa44f6
+https://medium.com/@denismakogon/python-3-fight-for-nonblocking-pipe-68f92429d18e
+http://www.dabeaz.com/coroutines/Coroutines.pdf
+await input python
+https://stackoverflow.com/questions/34497323/
+https://stackoverflow.com/questions/6006669/
+http://www.wellho.net/solutions/python-python-threads-a-first-example.html
+https://stackoverflow.com/questions/13033820/
+https://www.darkcoding.net/software/non-blocking-console-io-is-not-possible/
+https://stackoverflow.com/questions/30252112/
+https://stackoverflow.com/questions/1258566/
+https://repolinux.wordpress.com/2012/10/09/non-blocking-read-from-stdin-in-python/
