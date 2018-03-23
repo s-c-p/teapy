@@ -10,12 +10,12 @@ model = ImDict([('value', int, 0)])
 
 # update
 
-msgType("Inc", [], "message to increase count", globals())
-msgType("Dec", [], "message to decrease count", globals())
-msgType("Quit", [], "message to exit program", globals())
+msgType("Inc", [], "message to increase count")
+msgType("Dec", [], "message to decrease count")
+msgType("Quit", [], "message to exit program")
 
 def update(msg : Msg, model : appState) -> appState:
-    with switch(msg, locals(), globals()) as (case, default):
+    with switch(msg) as (case, default):
         @case(Inc)
         def _():
             old = model['value']

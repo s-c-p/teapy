@@ -1,5 +1,6 @@
 import pdb
 import uuid
+import inspect
 import logging
 from contextlib import contextmanager
 
@@ -10,7 +11,7 @@ class SwitchError(RuntimeError):
     pass
 
 @contextmanager
-def switch(switchable, returnNamespace, foreignContext):
+def switch(switchable):
     # TODO: logging, ? use `logging.handler` to use sqlite
     # DONE: duplicate-error
     # DONE: non-exhaustive-error
@@ -19,6 +20,11 @@ def switch(switchable, returnNamespace, foreignContext):
     #       so.com/q/2219998 so.com/q/5881873 so.com/q/3862310
 
     blocks = dict()
+    callFrame = inspect.currentframe()
+    funcFrame = callFrame.f_back.f_back # TODO: fragile
+    returnNamespace = locals_ = funcFrame.f_locals
+    foreignContext = globals_ = funcFrame.f_globals
+    
 
     # there might be a scenario where case_val IS the string `default`
     # to mitigate false positive in duplicate-default scan, we generate a

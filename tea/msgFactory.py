@@ -1,3 +1,5 @@
+import inspect
+
 # from tea import enforceTypes
 
 class MsgFactoryError(RuntimeError):
@@ -30,9 +32,9 @@ class {className}(Msg):
 
 # function defs -------------------------------------------------------------- 
 
-def msgType(tagger : str, types : list, description : str, context : dict):
+def msgType(tagger : str, types : list, description : str):
     """ create class `tagger` derived from Msg with
-    docstring being `description` in foreign-namespace `context`
+    docstring being `description` in foreign-namespace i.e. caller's globals()
 
     For sake of lib-user's ease and understanding, following
     renames were done:
@@ -50,6 +52,12 @@ def msgType(tagger : str, types : list, description : str, context : dict):
     >>> x = Dec() # since created class got inserted into present/current env's globals
     >>> assert x.description == 'message to decrease count'
     """
+    callFrame = inspect.currentframe()
+    # TODO: following code is fragile (maybe that;s good because it enforces
+    # strict coding on Main.elm.py??) because it assumes this function is
+    # called at the top level (0 indent) in calling file
+    funcFrame = callFrame.f_back
+    context = globals_ = funcFrame.f_globals
     # instead of doing:
     # context.update({'Msg' : globals()['Msg']})
     # and disturbing foreign namespace again n again, we do:

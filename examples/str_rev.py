@@ -12,13 +12,12 @@ model = ImDict([('content', str, "")])
 
 msgType("Change",
         [str],
-        "message to tag change in string",
-        globals())
-msgType("Quit", [], "message to exit this program", globals())
+        "message to tag change in string")
+msgType("Quit", [], "message to exit this program")
 
 @enforceTypes(Msg, appState)
 def update(msg, model) -> appState:
-    with switch(msg, locals(), globals()) as (case, default):
+    with switch(msg) as (case, default):
         @case(Change)
         def _():
             incm = msg.pattern_match()
