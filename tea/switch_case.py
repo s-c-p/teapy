@@ -111,6 +111,15 @@ def switch(switchable):
 
     # execute the desired function
     returnNamespace['switch_case_result'] = executeFn()
+    # based on this:-
+    # def inject(ctx):
+    #     local = 11
+    #     exec('ans = local', locals(), ctx)
+    # inject(globals())
+    # assert ans == 11
+    # i tried this:-
+    # exec('switch_case_result = executeFn()', locals(), returnNamespace)
+    # it doesn't work, works if i replace rtnNmspc w/ frnCtx, but thats ugly
     # logging.info("%s (%s) recieved with args-- %s", ???)
     return
 
