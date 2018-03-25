@@ -1,14 +1,35 @@
-#import asyncwebsockets
+from lomond import WebSocket
 
-import asyncio
-import websockets
+name = input("your name: ")
+ws = WebSocket("ws://127.0.0.1:5678/")
 
-async def hello():
-    async with websockets.connect('ws://localhost:5678') as websocket:
-        while True:
-            greeting = await websocket.recv()
-            print("< {}".format(greeting))
+def simple_run():
+    for event in ws:
+        # if event.name == 'poll':
+        #     print('sending data @' + str(time.monotonic()))
+        #     ws.send_text("<{} connected>".format(name))
+        # elif event.name == 'text':
+        if event.name == 'text':
+            print(event.text)
 
-asyncio.get_event_loop().run_until_complete(hello())
-# trio.run(hello)
+def threaded():
+    try:
+        simple_run()
+    except KeyboardInterrupt:
+        ws.close()
+    return
+
+def experiment():
+    import time
+    ibl = iter(ws)
+    while True:
+        try:
+            print(time.time(), next(ibl))
+        except KeyboardInterrupt:
+            break
+    ws.close()
+
+if __name__ == '__main__':
+    # threaded()
+    experiment()
 
