@@ -1,7 +1,7 @@
-from lomond import WebSocket
+from lomond
 
 name = input("your name: ")
-ws = WebSocket("ws://127.0.0.1:5678/")
+ws = lomond.WebSocket("ws://127.0.0.1:5678/")
 
 def simple_run():
     for event in ws:
@@ -28,6 +28,29 @@ def experiment():
         except KeyboardInterrupt:
             break
     ws.close()
+
+class TrioWebSocket(object):
+    def __init__(self, ws_addr):
+        self.ws_addr = ws
+
+    def __aiter__(self):
+        self.ws = lomond.WebSocket(self.ws_addr)
+        for event in self.ws:
+            if isinstance(event, lomond.events.Ready):
+                return self
+
+    async def __anext__(self):
+        i = iter(self.ws)
+        while True:
+            try:
+                incm = next(i)
+            except:
+                raise StopAsyncIteration
+            else:
+                return incm
+            finally:
+                self.ws.close()
+        return
 
 if __name__ == '__main__':
     # threaded()
