@@ -94,16 +94,6 @@ def ws_coro(ws_addr, init_msg=None):
     finally:
         ws.close()
 
-def frange(x):
-    c = int()
-    while c <= x:
-        reset = yield c
-        if reset is None:
-            c += 1
-        else:
-            c = reset
-    return
-
 async def frange1(x):
     c = int()
     while c <= x:
@@ -113,6 +103,16 @@ async def frange1(x):
         else:
             c = reset
     return
+
+async def runner1(x):
+    gen = frange1(x)
+    rewindPt = x // 2
+    async for e in gen:
+        if e == rewindPt:
+            await gen.asend(0)
+            input("Send rewind, see output below")
+        else:
+            print(e)
 
 async def frange2(x):
     c = int()
@@ -148,4 +148,45 @@ if __name__ == '__main__':
 #         while True:
 #             nur.call_soon(proc_next_iter)
 
+class MyWS(object):
+    def __init__(self, ws_addr):
+        self.ws = lomond.WebSocket(ws_addr)
+        self.sendQ = list()
+        self.recvQ = list()
+        run_forever(self.run_in_bg)
+
+    def run_in_bg(self):
+        itr = iter(self.ws)
+        while True:
+            try:
+                to_send = self.sendQ.pop()
+            except IndexError:
+                pass
+            else:
+                # fire and move on
+                ws.send_text(to_send)
+                # to do this or not to???
+                continue
+            # fire and move on
+            e = next(itr)
+            if isinstance(e, lomond.events.Text):
+                self.recvQ.append(e.text)
+            else:
+                continue
+        return
+
+    def recv(self):
+        try:
+            r = self.recvQ.pop()
+        except IndexError:
+            call self until timeout
+        return r
+
+    def recv_all(self):
+        r = self.recvQ
+        self.recvQ = list()
+        return r
+
+    def send(self, text):
+        self.sendQ.append(text)
 
